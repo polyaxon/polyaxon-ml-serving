@@ -1,0 +1,21 @@
+version: 1.1
+kind: component
+name: streamlit-iris-classification
+tags: ["streamlit", "app"]
+
+inputs:
+- name: uuid
+  type: str
+
+run:
+  kind: service
+  ports: [8501]
+  rewritePath: true
+  init:
+  - git: {"url": "https://github.com/polyaxon/polyaxon-ml-serving"}
+  - artifacts: {"files": [["{{ uuid }}/outputs/model/model.joblib", "{{ globals.artifacts_path }}/polyaxon-ml-serving/streamlit-app/model.joblib"]]}
+  container:
+    image: polyaxon/polyaxon-examples:ml-serving
+    workingDir: "{{ globals.artifacts_path }}/polyaxon-ml-serving/streamlit-app"
+    command: [streamlit, run, app.py]
+    args: ["--", "--model-path=./model.joblib"]

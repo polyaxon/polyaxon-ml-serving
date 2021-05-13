@@ -1,0 +1,18 @@
+version: 1.1
+kind: component
+name: batch-scoring
+tags: ["scoring", "job"]
+
+inputs:
+- name: uuid
+  type: str
+
+run:
+  kind: job
+  init:
+  - git: {"url": "https://github.com/polyaxon/polyaxon-ml-serving"}
+  - artifacts: {"files": [["{{ uuid }}/outputs/model/model.joblib", "{{ globals.artifacts_path }}/polyaxon-ml-serving/batch-scoring/model.joblib"]]}
+  container:
+    image: polyaxon/polyaxon-examples:ml-serving
+    workingDir: "{{ globals.artifacts_path }}/polyaxon-ml-serving/batch-scoring"
+    command: ["python", "-u", "scoring_job.py"]

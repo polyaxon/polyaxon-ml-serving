@@ -1,0 +1,21 @@
+version: 1.1
+kind: component
+name: fastapi-iris-classification
+tags: ["fastapi", "api"]
+
+inputs:
+- name: uuid
+  type: str
+
+run:
+  kind: service
+  ports: [8000]
+  rewritePath: true
+  init:
+  - git: {"url": "https://github.com/polyaxon/polyaxon-ml-serving"}
+  - artifacts: {"files": [["{{ uuid }}/outputs/model/model.joblib", "{{ globals.artifacts_path }}/polyaxon-ml-serving/fastapi-serving/model.joblib"]]}
+  container:
+    image: polyaxon/polyaxon-examples:ml-serving
+    workingDir: "{{ globals.artifacts_path }}/polyaxon-ml-serving/fastapi-serving"
+    command: ["sh", "-c"]
+    args: ["uvicorn app:app --host 0.0.0.0 --port 8000"]
